@@ -1,3 +1,14 @@
+# Link Tree w/ Previews
+
+This is a simple link tree with previews. It's built with Next.js, RadixUI and Tailwind CSS.
+
+## Features
+
+- Basic Link Tree w/ Socials
+- Dynamic Previews generated using Puppeteer on lambda
+
+---
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
