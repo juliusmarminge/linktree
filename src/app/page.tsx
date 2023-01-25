@@ -1,8 +1,7 @@
-import { CalendarDays, GithubIcon, TwitterIcon } from "lucide-react";
+import { GithubIcon, TwitterIcon } from "lucide-react";
 import Image from "next/image";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/ui/hover-card";
 import { LinkCard } from "./link-card";
-import { Data, Link } from "./types";
+import { Data } from "./types";
 
 export const runtime = "edge";
 
