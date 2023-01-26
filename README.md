@@ -1,6 +1,8 @@
 # Link Tree w/ Previews
 
-This is a simple link tree with previews. It's built with Next.js, RadixUI and Tailwind CSS.
+This is a simple link tree with previews. It's built with Next.js (`/app`-dir), RadixUI and Tailwind CSS.
+
+**NOTE: This is built using experimental technology for fun - expect there to be bugs.**
 
 ## Features
 
