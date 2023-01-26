@@ -1,4 +1,7 @@
 "use client";
+
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer, toast } from "react-toastify";
 import {
   Dialog,
   DialogClose,
@@ -15,9 +18,10 @@ import {
   ArrowDown,
   Edit,
   Palette,
+  CheckIcon,
 } from "lucide-react";
 
-import { useState } from "react";
+import { cache, use, useState } from "react";
 import { socialProviders, type SocialProvider } from "~/utils/socials";
 import NextLink from "next/link";
 import { Button } from "~/ui/button";
@@ -32,27 +36,25 @@ import {
   DropdownMenuTrigger,
 } from "~/ui/dropdown";
 import { Textarea } from "~/ui/text-area";
+import { trpc, type RouterOutputs } from "~/server/api";
+import { useRouter } from "next/navigation";
+
+type Link = RouterOutputs["tree"]["byHandle"]["tree"]["links"][number];
+type Social = RouterOutputs["tree"]["byHandle"]["tree"]["socials"][number];
+
+const treeQuery = cache((name: string) => trpc.tree.byHandle.query(name));
 
 export default function HomePage({ params }: { params: { name: string } }) {
-  const [parent] = useAutoAnimate<HTMLDivElement>();
-  const [tree, setTree] = useState(trees.get(params.name));
-  if (!tree) throw new Error("User not found");
+  const { tree: serverTree, user: serverUser } = use(treeQuery(params.name));
+  const [tree, setTree] = useState(serverTree);
+  const [user, setUser] = useState(serverUser);
 
-  const moveLink = (index: number, increment: 1 | -1) => {
-    const newLinks = [...tree.links];
-    const link = tree.links[index];
-    const tmp = newLinks[index + increment];
-    if (tmp) {
-      newLinks[index] = tmp;
-      newLinks[index + increment] = link;
-    }
-    setTree({ ...tree, links: newLinks });
-  };
+  const router = useRouter();
 
-  const [editBgGradient, setEditBgGradient] = useState(tree.bgGradient);
-  const [editProfilePic, setEditProfilePic] = useState(tree.avatar);
-  const [editDisplayName, setEditDisplayName] = useState(tree.name);
-  const [editLinkTitle, setEditLinkTitle] = useState("");
+  const [editBgGradient, setEditBgGradient] = useState(user.bgGradient);
+  const [editProfilePic, setEditProfilePic] = useState(user.image);
+  const [editDisplayName, setEditDisplayName] = useState(user.name);
+  const [editLinkLabel, setEditLinkLabel] = useState("");
   const [editLinkHref, setEditLinkHref] = useState("");
   const [editSocialProvider, setEditSocialProvider] = useState<
     SocialProvider | undefined
@@ -60,7 +62,7 @@ export default function HomePage({ params }: { params: { name: string } }) {
   const [editSocialHref, setEditSocialHref] = useState("");
 
   const selectLink = (link: Link) => {
-    setEditLinkTitle(link.title);
+    setEditLinkLabel(link.label);
     setEditLinkHref(link.href);
   };
 
@@ -73,8 +75,19 @@ export default function HomePage({ params }: { params: { name: string } }) {
     const newLinks = [...tree.links];
     newLinks[index] = {
       ...newLinks[index],
-      title: editLinkTitle,
+      label: editLinkLabel,
     };
+    setTree({ ...tree, links: newLinks });
+  };
+
+  const moveLink = async (index: number, increment: 1 | -1) => {
+    const newLinks = [...tree.links];
+    const link = tree.links[index];
+    const tmp = newLinks[index + increment];
+    if (tmp) {
+      newLinks[index] = tmp;
+      newLinks[index + increment] = link;
+    }
     setTree({ ...tree, links: newLinks });
   };
 
@@ -84,15 +97,15 @@ export default function HomePage({ params }: { params: { name: string } }) {
       .replace("background-image:", "")
       .replace(";", "");
     document.body.style.setProperty("--bg-gradient", parsed);
-    setTree({ ...tree, bgGradient: parsed });
+    setUser({ ...user, bgGradient: parsed });
   };
 
   const saveImg = () => {
-    setTree({ ...tree, avatar: editProfilePic });
+    setUser({ ...user, image: editProfilePic });
   };
 
   const saveDisplayName = () => {
-    setTree({ ...tree, name: editDisplayName });
+    setUser({ ...user, name: editDisplayName });
   };
 
   const saveSocial = (index: number) => {
@@ -105,6 +118,23 @@ export default function HomePage({ params }: { params: { name: string } }) {
 
     setTree({ ...tree, socials: newSocials });
   };
+
+  const storeTree = async () => {
+    await toast.promise(
+      Promise.all([
+        trpc.tree.update.mutate(tree),
+        trpc.user.update.mutate(user),
+      ]),
+      {
+        pending: "Saving all changes...",
+        success: "Saved all changes!",
+        error: "Failed to save changes",
+      }
+    );
+    router.push(`/${params.name}`);
+  };
+
+  const [parent] = useAutoAnimate<HTMLDivElement>();
 
   return (
     <div className="flex items-center flex-col mx-auto w-full justify-center pt-16 max-w-3xl">
@@ -152,14 +182,22 @@ export default function HomePage({ params }: { params: { name: string } }) {
       </Dialog>
       {/* END EDIT BACKGROUND GRADIENT */}
 
+      <Button
+        variant="outline"
+        onClick={() => storeTree()}
+        className="absolute p-2 dark:border-green-500 translate-x-28 sm:translate-x-36 md:translate-x-52 -translate-y-24"
+      >
+        Save changes <CheckIcon className="h-6 w-6 text-green-500" />
+      </Button>
+
       {/* START EDIT PROFILE PIC */}
       <Dialog>
         <DialogTrigger asChild>
           <button className="relative w-24 h-24 group">
             <img
               className="rounded-full absolute top-1/2 -translate-y-1/2"
-              alt={tree.name}
-              src={tree.avatar}
+              alt={user.name}
+              src={user.image}
               width={96}
               height={96}
             />
@@ -192,7 +230,7 @@ export default function HomePage({ params }: { params: { name: string } }) {
       <Dialog>
         <DialogTrigger asChild>
           <h1 className="font-bold mt-4 mb-8 text-xl text-white hover:text-slate-300 relative group">
-            {tree.name}
+            {user.name}
             <Edit className="absolute right-0 top-0 translate-x-4 -translate-y-2 h-4 invisible group-hover:visible" />
           </h1>
         </DialogTrigger>
@@ -228,7 +266,7 @@ export default function HomePage({ params }: { params: { name: string } }) {
                 onClick={() => selectLink(link)}
               >
                 <h2 className="flex justify-center items-center font-semibold w-full h-10">
-                  {link.title}
+                  {link.label}
                 </h2>
                 {index !== 0 && (
                   <Button
@@ -261,8 +299,8 @@ export default function HomePage({ params }: { params: { name: string } }) {
               <div className="flex flex-col gap-4 py-4">
                 <Input
                   placeholder="Link title"
-                  value={editLinkTitle}
-                  onChange={(e) => setEditLinkTitle(e.currentTarget.value)}
+                  value={editLinkLabel}
+                  onChange={(e) => setEditLinkLabel(e.currentTarget.value)}
                 />
                 <Input
                   placeholder="Link href"
@@ -354,6 +392,7 @@ export default function HomePage({ params }: { params: { name: string } }) {
         ))}
       </div>
       {/* END EDIT SOCIALS */}
+      <ToastContainer />
     </div>
   );
 }
