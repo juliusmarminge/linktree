@@ -1,12 +1,15 @@
 "use client";
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/ui/hover-card";
-import { Link } from "~/data";
 import Image from "next/image";
 import { useState } from "react";
 import { cn } from "~/utils/cn";
+import { type Link } from "@prisma/client";
+import { RouterOutputs } from "~/server/api";
 
-export function LinkCard({ href, title }: Link) {
+type LinkProps = RouterOutputs["tree"]["byHandle"]["tree"]["links"][number];
+
+export function LinkCard({ href, label }: LinkProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -40,7 +43,7 @@ export function LinkCard({ href, title }: Link) {
         >
           <div className="flex text-center w-full">
             <h2 className="flex justify-center items-center font-semibold w-full text-slate-800 h-10">
-              {title}
+              {label}
             </h2>
           </div>
         </a>

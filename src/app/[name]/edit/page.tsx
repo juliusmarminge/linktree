@@ -18,9 +18,9 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
-import { Link, Social, SocialProvider, socialProviders, trees } from "~/data";
+import { socialProviders, type SocialProvider } from "~/utils/socials";
 import NextLink from "next/link";
-import { Button, buttonVariants } from "~/ui/button";
+import { Button } from "~/ui/button";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { cn } from "~/utils/cn";
 import { Input } from "~/ui/input";
@@ -107,7 +107,7 @@ export default function HomePage({ params }: { params: { name: string } }) {
   };
 
   return (
-    <div className="flex items-center flex-col mx-auto w-full justify-center pt-16 max-w-3x">
+    <div className="flex items-center flex-col mx-auto w-full justify-center pt-16 max-w-3xl">
       {/* START EDIT BACKGROUND GRADIENT */}
       <Dialog>
         <DialogTrigger asChild className="absolute">
