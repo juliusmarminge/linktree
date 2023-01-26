@@ -2,13 +2,14 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import chromium from "chrome-aws-lambda";
 import puppeteer from "puppeteer-core";
-import { previewImageParams } from "~/utils/zod-params";
+
+/** Sites that we won't visit and screenshot for... reasons */
+const blockedSites = new Set(["https://xxx.com"]);
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!req.url?.startsWith("http")) req.url = `http://yoyo.com${req.url}`;
-  const parsed = previewImageParams.decodeRequest(req);
-  if (!parsed.success) return res.status(400).json(parsed.error);
-  const props = parsed.data.input;
+  const url = req.query.url as string | undefined;
+  if (!url) return res.status(400).end("Missing url parameter");
+  if (blockedSites.has(url)) return res.status(400).end("Blocked site");
 
   const browser = await puppeteer.launch(
     process.env.AWS_EXECUTION_ENV
@@ -25,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   );
 
   const page = await browser.newPage();
-  await page.goto(props.url);
+  await page.goto(url);
   await page.setViewport({ width: 1280, height: 720, deviceScaleFactor: 1 });
 
   const img = await page.screenshot({ type: "png" });
