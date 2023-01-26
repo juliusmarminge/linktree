@@ -1,10 +1,11 @@
-import { Facebook, Github, Linkedin, Twitter } from "lucide-react";
+import { Facebook, Github, Linkedin, Twitter, Youtube } from "lucide-react";
 
 export const socialProviders = {
-  Twitter: <Twitter />,
-  Github: <Github />,
   Facebook: <Facebook />,
+  Github: <Github />,
   LinkedIn: <Linkedin />,
+  Twitter: <Twitter />,
+  YouTube: <Youtube />,
 };
 export type SocialProvider = keyof typeof socialProviders;
 export const getSocialIcon = (href: string) => {

@@ -2,11 +2,7 @@ import Image from "next/image";
 import { LinkCard } from "./link-card";
 import { socialProviders, trees } from "~/data";
 
-interface PageProps {
-  params: { name: string };
-}
-
-export default function HomePage({ params }: PageProps) {
+export default function HomePage({ params }: { params: { name: string } }) {
   const tree = trees.get(params.name);
   if (!tree) throw new Error("User not found");
 

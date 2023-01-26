@@ -24,11 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "~/ui/dropdown";
 
-interface PageProps {
-  params: { name: string };
-}
-
-export default function HomePage({ params }: PageProps) {
+export default function HomePage({ params }: { params: { name: string } }) {
   const [parent] = useAutoAnimate<HTMLDivElement>();
   const [tree, setTree] = useState(trees.get(params.name));
   if (!tree) throw new Error("User not found");
@@ -93,46 +89,42 @@ export default function HomePage({ params }: PageProps) {
 
   return (
     <div className="flex items-center flex-col mx-auto w-full justify-center pt-16 max-w-3xl">
-      <div className="flex justify-center relative w-full">
-        <div className="flex justify-center relative">
-          {/* START EDIT PROFILE PIC */}
-          <Dialog>
-            <DialogTrigger asChild>
-              <button className="relative w-24 h-24 group">
-                <img
-                  className="rounded-full absolute top-1/2 -translate-y-1/2"
-                  alt={tree.name}
-                  src={tree.avatar}
-                  width={96}
-                  height={96}
-                />
+      {/* START EDIT PROFILE PIC */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <button className="relative w-24 h-24 group">
+            <img
+              className="rounded-full absolute top-1/2 -translate-y-1/2"
+              alt={tree.name}
+              src={tree.avatar}
+              width={96}
+              height={96}
+            />
 
-                <ImageIcon className="h-24 w-24 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 invisible group-hover:visible bg-slate-700/40 p-4 rounded-full" />
-              </button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Edit Profile Picture</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col gap-4 py-4">
-                <Input
-                  placeholder="Link title"
-                  value={editProfilePic}
-                  onChange={(e) => setEditProfilePic(e.currentTarget.value)}
-                />
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button type="submit" onClick={() => saveImg()}>
-                    Save changes
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          {/* END EDIT PROFILE PIC */}
-        </div>
-      </div>
+            <ImageIcon className="h-24 w-24 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 invisible group-hover:visible bg-slate-700/40 p-4 rounded-full" />
+          </button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Profile Picture</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Input
+              placeholder="Link title"
+              value={editProfilePic}
+              onChange={(e) => setEditProfilePic(e.currentTarget.value)}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="submit" onClick={() => saveImg()}>
+                Save changes
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* END EDIT PROFILE PIC */}
 
       {/* START EDIT NAME */}
       <Dialog>
@@ -164,6 +156,7 @@ export default function HomePage({ params }: PageProps) {
       </Dialog>
       {/* END EDIT NAME */}
 
+      {/* START EDIT LINKS */}
       <div ref={parent} className="flex flex-col gap-4 w-full">
         {tree.links.map((link, index) => (
           <Dialog key={link.href}>
@@ -226,7 +219,9 @@ export default function HomePage({ params }: PageProps) {
           </Dialog>
         ))}
       </div>
+      {/* END EDIT LINKS */}
 
+      {/* START EDIT SOCIALS */}
       <div className="flex items-center gap-4 mt-8 text-white">
         {tree.socials.map((social, index) => (
           <Dialog key={social.href}>
@@ -296,6 +291,7 @@ export default function HomePage({ params }: PageProps) {
           </Dialog>
         ))}
       </div>
+      {/* END EDIT SOCIALS */}
     </div>
   );
 }

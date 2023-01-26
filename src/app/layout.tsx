@@ -4,17 +4,14 @@ import { unstable_getServerSession } from "next-auth";
 
 import { cn } from "~/utils/cn";
 import { AvatarDropdown } from "./avatar-dropdown";
+import { ReactNode } from "react";
 
 const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
-export default async function RootLayout({ children }: RootLayoutProps) {
+export default async function Layout({ children }: { children: ReactNode }) {
   const session = await unstable_getServerSession();
 
   return (
