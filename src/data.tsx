@@ -18,6 +18,7 @@ export const getSocialIcon = (href: string) => {
 
 export interface Tree {
   name: string;
+  bgGradient: string;
   avatar: string;
   gradient: { direction: `${number}deg`; steps: string[] };
   links: Link[];
@@ -39,6 +40,18 @@ export const trees = new Map<string, Tree>([
     "julius",
     {
       name: "Julius Marminge",
+      bgGradient: `linear-gradient(
+        25deg,
+        hsl(240deg 15% 13%) 0%,
+        hsl(233deg 22% 15%) 11%,
+        hsl(226deg 30% 17%) 23%,
+        hsl(221deg 40% 18%) 36%,
+        hsl(215deg 52% 19%) 48%,
+        hsl(221deg 62% 26%) 61%,
+        hsl(238deg 46% 36%) 74%,
+        hsl(264deg 54% 40%) 87%,
+        hsl(287deg 84% 36%) 100%
+      );`,
       avatar: "https://github.com/juliusmarminge.png",
       gradient: { direction: "25deg", steps: [] },
       links: [
@@ -60,6 +73,7 @@ export const trees = new Map<string, Tree>([
     "theo",
     {
       name: "Theo Browne",
+      bgGradient: "",
       avatar: "https://github.com/t3dotgg.png",
       gradient: { direction: "25deg", steps: [] },
       links: [

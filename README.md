@@ -6,8 +6,8 @@ This is a simple link tree with previews. It's built with Next.js, RadixUI and T
 
 - ✅ Basic Link Tree w/ Socials
 - ✅ Dynamic Previews generated using Puppeteer on lambda
-- 🔜 Add your own links (hardcoded for now)
-- 🔜 Customize your page's background color
+- ✅ Customize your page to how you want it
+- 🔜 Make it full-stack with persistence
 
 ![CleanShot 2023-01-25 at 11 22 08](https://user-images.githubusercontent.com/51714798/214538662-ad25ffd9-59c8-4da1-8eaa-1927963114a2.gif)
 

@@ -3,16 +3,24 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "~/ui/dialog";
-import { Image as ImageIcon, ArrowUp, ArrowDown, Edit } from "lucide-react";
+import {
+  Image as ImageIcon,
+  ArrowUp,
+  ArrowDown,
+  Edit,
+  Palette,
+} from "lucide-react";
 
 import { useState } from "react";
 import { Link, Social, SocialProvider, socialProviders, trees } from "~/data";
-import { Button } from "~/ui/button";
+import NextLink from "next/link";
+import { Button, buttonVariants } from "~/ui/button";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { cn } from "~/utils/cn";
 import { Input } from "~/ui/input";
@@ -23,6 +31,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "~/ui/dropdown";
+import { Textarea } from "~/ui/text-area";
 
 export default function HomePage({ params }: { params: { name: string } }) {
   const [parent] = useAutoAnimate<HTMLDivElement>();
@@ -40,6 +49,7 @@ export default function HomePage({ params }: { params: { name: string } }) {
     setTree({ ...tree, links: newLinks });
   };
 
+  const [editBgGradient, setEditBgGradient] = useState(tree.bgGradient);
   const [editProfilePic, setEditProfilePic] = useState(tree.avatar);
   const [editDisplayName, setEditDisplayName] = useState(tree.name);
   const [editLinkTitle, setEditLinkTitle] = useState("");
@@ -68,6 +78,15 @@ export default function HomePage({ params }: { params: { name: string } }) {
     setTree({ ...tree, links: newLinks });
   };
 
+  const saveBgGradient = () => {
+    /* Remove `background-image:` if there is, as well as a trailing `;` */
+    const parsed = editBgGradient
+      .replace("background-image:", "")
+      .replace(";", "");
+    document.body.style.setProperty("--bg-gradient", parsed);
+    setTree({ ...tree, bgGradient: parsed });
+  };
+
   const saveImg = () => {
     setTree({ ...tree, avatar: editProfilePic });
   };
@@ -88,7 +107,51 @@ export default function HomePage({ params }: { params: { name: string } }) {
   };
 
   return (
-    <div className="flex items-center flex-col mx-auto w-full justify-center pt-16 max-w-3xl">
+    <div className="flex items-center flex-col mx-auto w-full justify-center pt-16 max-w-3x">
+      {/* START EDIT BACKGROUND GRADIENT */}
+      <Dialog>
+        <DialogTrigger asChild className="absolute">
+          <Button
+            variant="ghost"
+            className="h-14 w-14 p-2 rounded-full translate-x-28 sm:translate-x-36 md:translate-x-52 -translate-y-40"
+          >
+            <Palette className="h-12 w-12 rounded-full text-clip" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Background Gradient</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            Generate a gradient from{" "}
+            <NextLink
+              href="https://www.joshwcomeau.com/gradient-generator/"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium underline underline-offset-4"
+            >
+              here
+            </NextLink>
+            , then paste the generated CSS here.
+          </DialogDescription>
+          <div className="flex flex-col gap-4 py-4">
+            <Textarea
+              placeholder="linear-gradient(25deg, hsl(240deg 15% 13%) 0%, hsl(264deg 54% 40%) 87%, hsl(287deg 84% 36%) 100%)"
+              value={editBgGradient}
+              onChange={(e) => setEditBgGradient(e.currentTarget.value)}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="submit" onClick={() => saveBgGradient()}>
+                Save changes
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* END EDIT BACKGROUND GRADIENT */}
+
       {/* START EDIT PROFILE PIC */}
       <Dialog>
         <DialogTrigger asChild>
@@ -100,7 +163,6 @@ export default function HomePage({ params }: { params: { name: string } }) {
               width={96}
               height={96}
             />
-
             <ImageIcon className="h-24 w-24 absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 invisible group-hover:visible bg-slate-700/40 p-4 rounded-full" />
           </button>
         </DialogTrigger>
@@ -165,6 +227,9 @@ export default function HomePage({ params }: { params: { name: string } }) {
                 className="relative group flex items-center text-center w-full p-1 text-slate-800 bg-slate-300 hover:bg-slate-300/90 rounded-md cursor-pointer"
                 onClick={() => selectLink(link)}
               >
+                <h2 className="flex justify-center items-center font-semibold w-full h-10">
+                  {link.title}
+                </h2>
                 {index !== 0 && (
                   <Button
                     className={cn(
@@ -187,9 +252,6 @@ export default function HomePage({ params }: { params: { name: string } }) {
                     <ArrowDown className="h-4 w-4" />
                   </Button>
                 )}
-                <h2 className="flex justify-center items-center font-semibold w-full h-10">
-                  {link.title}
-                </h2>
               </div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
